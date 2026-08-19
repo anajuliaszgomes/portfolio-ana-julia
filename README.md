@@ -5,7 +5,9 @@ Sistema simples de CRM voltado para o setor comercial rural.
  **Acesse o site:** [https://crmcomercialrural.netlify.app](https://crmcomercialrural.netlify.app)
  
 ### Acesso de demonstração
-- **Senha:** anajulia
+
+O sistema possui área de login.  
+Para testar o projeto, entre em contato comigo que eu forneço o acesso.
 - 
 ## Sobre o projeto
 
