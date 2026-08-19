@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM Comercial — Palin & Martins</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+<style>
+/* ── Login e seleção de departamento ── */
+#loginScreen,#deptScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:1rem;}
+.gate-card{background:#fff;border:.5px solid var(--bd);border-radius:14px;padding:2.5rem 2rem;max-width:380px;width:100%;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.gate-card h1{font-size:1.1rem;font-weight:600;color:var(--g1);margin-bottom:.3rem;}
+.gate-card p{font-size:12px;color:var(--t2);margin-bottom:1.3rem;}
+.gate-card input[type=password]{width:100%;border:.5px solid #d1d5db;border-radius:8px;padding:.6rem .8rem;font-size:14px;font-family:inherit;margin-bottom:.8rem;text-align:center;}
+.gate-card button.gate-btn{width:100%;background:var(--g1);color:#fff;border:none;border-radius:8px;padding:.65rem;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;}
+.gate-btn:hover{background:var(--g2);}
+.gate-err{font-size:12px;color:#991b1b;margin-top:.5rem;display:none;}
+
+.dept-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:480px;width:100%;}
+.dept-card{background:#fff;border:.5px solid var(--bd);border-radius:12px;padding:1.5rem 1rem;text-align:center;cursor:pointer;transition:.15s;}
+.dept-card:hover{border-color:var(--g2);box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.dept-card.disabled{opacity:.45;cursor:not-allowed;}
+.dept-card .di{font-size:1.8rem;margin-bottom:.5rem;}
+.dept-card .dn{font-size:13px;font-weight:600;color:var(--g1);}
+.dept-card .ds{font-size:10px;color:var(--t2);margin-top:2px;}
+.dept-header{grid-column:1/-1;text-align:center;margin-bottom:.5rem;}
+.dept-header h1{font-size:1.1rem;font-weight:600;color:var(--g1);}
+.dept-header p{font-size:12px;color:var(--t2);margin-top:.2rem;}
+.dept-back{grid-column:1/-1;text-align:center;margin-top:1rem;}
+.dept-back button{background:none;border:none;color:var(--t2);font-size:12px;cursor:pointer;text-decoration:underline;font-family:inherit;}
+</style>
+</head>
+<body>
+
+<!-- ── TELA DE SENHA ── -->
+<div id="loginScreen">
+  <div class="gate-card">
+    <h1>CRM Comercial</h1>
+    <p>Palin &amp; Martins — acesso restrito</p>
+    <input type="password" id="loginPass" placeholder="Senha de acesso" onkeydown="if(event.key==='Enter')tentarLogin()">
+    <button class="gate-btn" onclick="tentarLogin()">Entrar</button>
+    <div class="gate-err" id="loginErr">Senha incorreta.</div>
+  </div>
+</div>
+
+<!-- ── TELA DE DEPARTAMENTO ── -->
+<div id="deptScreen" style="display:none">
+  <div class="dept-grid">
+    <div class="dept-header">
+      <h1>Escolha seu departamento</h1>
+      <p>Selecione a área para acessar o painel correspondente</p>
+    </div>
+    <div class="dept-card" onclick="abrirDept('rural')">
+      <div class="di">🌾</div>
+      <div class="dn">Comercial Rural</div>
+      <div class="ds">ICMS Rural</div>
+    </div>
+    <div class="dept-card disabled" title="Em breve">
+      <div class="di">🏢</div>
+      <div class="dn">Comercial PJ</div>
+      <div class="ds">Em breve</div>
+    </div>
+    <div class="dept-card disabled" title="Em breve">
+      <div class="di">⚖️</div>
+      <div class="dn">Jurídico</div>
+      <div class="ds">Em breve</div>
+    </div>
+    <div class="dept-card disabled" title="Em breve">
+      <div class="di">🎓</div>
+      <div class="dn">Educacional</div>
+      <div class="ds">Em breve</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PAINEL COMERCIAL RURAL ── -->
+<div id="appRural" style="display:none">
+<header>
+  <h1>COMERCIAL RURAL</h1>
+  <div class="hr">
+    <button class="btn" style="background:rgba(255,255,255,.12);color:#fff;border:.5px solid rgba(255,255,255,.2)" onclick="voltarDept()">← Departamentos</button>
+  </div>
+</header>
+<main>
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('comercial')">Comercial</div>
+    <div class="tab" onclick="showTab('clientes')">Clientes</div>
+    <div class="tab" onclick="showTab('pipeline')">Pipeline</div>
+    <div class="tab" onclick="showTab('workshops')">Workshops</div>
+    <div class="tab" onclick="showTab('renovacoes')">Renovações</div>
+    <div class="tab" onclick="showTab('maquinarios')">Maquinários</div>
+  </div>
+
+  <div class="sec active" id="tab-comercial">
+    <div class="kpis" id="kpis"></div>
+    <div class="g2">
+      <div class="card"><div class="ch">Resultado Mensal</div>
+        <table><thead><tr><th>Mês</th><th>Novos</th><th>Enviados</th><th>Qualif.</th><th>Conv.</th><th>Conv%</th><th>Acum.</th><th>Status</th></tr></thead>
+        <tbody id="tBody"></tbody></table>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="card"><div class="ch">Funil</div><div id="funil"></div></div>
+        <div class="card"><div class="ch">Análise</div><div id="insights"></div></div>
+      </div>
+    </div>
+    <div class="cc"><div class="ch">Evolução Acumulada — Contratos x Meta</div><div class="cw"><canvas id="chart"></canvas></div></div>
+  </div>
+
+  <div class="sec" id="tab-clientes">
+    <div style="display:flex;align-items:center;gap:10px;background:#eff6ff;border:.5px solid #bfdbfe;border-radius:10px;padding:.7rem 1rem;margin-bottom:.9rem;font-size:12px;color:#1e40af;">
+      <span style="font-size:16px">🔒</span>
+      <span>Para verificar <strong>saldo</strong>, <strong>CNPJ</strong> e outros dados sensíveis de cada cliente, consulte o <strong>ClickUp</strong>. Os nomes exibidos aqui são mascarados conforme a LGPD.</span>
+    </div>
+    <div class="cli-view-toggle" style="display:flex;gap:8px;margin-bottom:.7rem;align-items:center;flex-wrap:wrap">
+      <button class="btn viewbtn active" id="vb-mes" onclick="setViewMode('mes')" style="background:var(--g1);color:#fff">Por Mês</button>
+      <button class="btn viewbtn" id="vb-status" onclick="setViewMode('status')" style="background:#f3f4f6;color:var(--t2)">Por Status</button>
+      <button class="btn" id="btnAddMes" onclick="addMes()" style="background:var(--go);color:#fff;margin-left:auto">+ Adicionar mês</button>
+    </div>
+    <div class="cli-bar">
+      <input class="srch" placeholder="Buscar cliente..." oninput="filtroNome=this.value.toLowerCase();renderClientes()">
+      <select class="fsel" id="fselStatus" onchange="filtroStatus=this.value;renderClientes()">
+        <option value="">Todos os status</option>
+        <option value="credenciamento">Em Credenciamento</option>
+        <option value="ext_aberto">Protocolo Ext. Aberto</option>
+        <option value="aguardando_doc">Aguardando Documentos</option>
+        <option value="aguardando_notas">Aguardando Notas</option>
+        <option value="saldo">Saldo Disponível</option>
+        <option value="pendente_assinatura">Pendente Assinatura</option>
+        <option value="enviado">Contrato Enviado</option>
+        <option value="distrato">Distrato</option>
+      </select>
+    </div>
+    <div id="cliContainer"></div>
+  </div>
+
+  <div class="sec" id="tab-pipeline">
+    <div class="addp">
+      <input id="pnome" placeholder="Nome do lead..." onkeydown="if(event.key==='Enter')addPipe()">
+      <input id="pst" placeholder="Status..." onkeydown="if(event.key==='Enter')addPipe()">
+      <button onclick="addPipe()">+ Adicionar</button>
+    </div>
+    <div class="pgrid" id="pgrid"></div>
+  </div>
+
+  <div class="sec" id="tab-workshops">
+    <div style="font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:.7rem">Workshops 2026</div>
+    <div id="wsContent"></div>
+  </div>
+
+  <div class="sec" id="tab-renovacoes">
+    <div class="card"><div class="ch">Renovações 2026 (informativo)</div>
+      <table><thead><tr><th>Mês</th><th>Qtd.</th><th>Observação</th></tr></thead><tbody id="renovBody"></tbody></table>
+    </div>
+    <div style="font-size:1.5rem;font-weight:500;color:#1565c0;padding:1rem 0" id="renovTotal"></div>
+  </div>
+
+  <div class="sec" id="tab-maquinarios">
+    <div id="maqContainer"></div>
+  </div>
+</main>
+<div id="toast"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+<script>
+// ── ACESSO: senha + departamento ──────────────────────────────────
+// Altere a senha aqui:
+const SENHA_ACESSO = 'anajulia';
+
+function tentarLogin(){
+  const val = document.getElementById('loginPass').value;
+  if(val === SENHA_ACESSO){
+    sessionStorage.setItem('crm_logado','1');
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('deptScreen').style.display='flex';
+  } else {
+    document.getElementById('loginErr').style.display='block';
+  }
+}
+
+function abrirDept(nome){
+  if(nome==='rural'){
+    document.getElementById('deptScreen').style.display='none';
+    document.getElementById('appRural').style.display='block';
+    // o gráfico foi criado com o painel escondido (tamanho zero) — força recalcular o tamanho agora que está visível
+    setTimeout(()=>{ if(typeof ch!=='undefined' && ch){ ch.resize(); ch.update(); } }, 50);
+    if(typeof mostrarLembrete==='function') mostrarLembrete();
+  }
+}
+
+function voltarDept(){
+  document.getElementById('appRural').style.display='none';
+  document.getElementById('deptScreen').style.display='flex';
+}
+
+// Mantém logado durante a sessão do navegador (fecha ao fechar a aba)
+if(sessionStorage.getItem('crm_logado')==='1'){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('deptScreen').style.display='flex';
+}
+</script>
+</body>
+</html>
